@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <Target Name="ILRepacker" AfterTargets="Build" Condition="'$(Configuration)' == 'Release'">
+        
+        <ItemGroup>
+            <InputAssemblies Include="$(OutputPath)*.dll" Exclude="$(OutputPath)$(TargetName).dll" />
+        </ItemGroup>
+
+        <ILRepack
+            Parallel="true"
+            Internalize="true"
+            InputAssemblies="@(InputAssemblies)"
+            TargetKind="SameAsPrimary"
+            OutputFile="$(OutputPath)$(TargetName)$(TargetExt)"
+            MainAssembly="$(OutputPath)$(TargetName)$(TargetExt)"
+            WorkingDirectory="$(MSBuildProjectDirectory)\$(OutputPath)"
+            LibraryPath="$(OutputPath)"
+        />
+
+        <Delete Files="@(InputAssemblies)" />
+    </Target>
+</Project>
