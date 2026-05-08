@@ -7,7 +7,7 @@
 
 It redirects all application traffic to a SOCKS proxy at the system level.
 
-[<- Back to Russian](/README.md)
+[🐻 Русская версия](/README.md)
 
 ## 🤔 Why use Droute?
 - **⚡ Autonomy:** Discord becomes a self-contained proxy client. It ignores system-wide VPN or proxy settings—if you turn off your main VPN, Discord will continue to operate through the specified proxy.
