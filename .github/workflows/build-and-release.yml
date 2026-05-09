@@ -1,0 +1,88 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Setup NuGet
+        uses: nuget/setup-nuget@v2
+        with:
+          nuget-version: 'latest'
+
+      - name: Restore NuGet packages
+        run: nuget restore droute.sln
+
+      - name: Ensure Resources directory exists
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path "installer\Resources" | Out-Null
+
+      - name: Build solution
+        run: msbuild droute.sln /p:Configuration=Release /p:Platform=x64 /p:RestorePackages=false /verbosity:minimal
+
+      - name: Verify build outputs
+        shell: pwsh
+        run: |
+          $exe = "installer\bin\Release\droute.exe"
+          $dll = "installer\Resources\droute.dll"
+          if (!(Test-Path $exe)) {
+            Write-Error "droute.exe not found at $exe"
+            exit 1
+          }
+          if (!(Test-Path $dll)) {
+            Write-Error "droute.dll was not copied to installer\Resources"
+            exit 1
+          }
+          Write-Output "Build outputs verified successfully."
+
+      - name: Prepare release archive
+        shell: pwsh
+        run: |
+          $outDir = "release"
+          New-Item -ItemType Directory -Force -Path $outDir | Out-Null
+          Copy-Item "installer\bin\Release\droute.exe" -Destination $outDir
+          Get-ChildItem -Path "installer\bin\Release" -Directory | ForEach-Object {
+            Copy-Item $_.FullName -Destination "$outDir\$($_.Name)" -Recurse -Force
+          }
+          Copy-Item "README.md" -Destination $outDir -ErrorAction SilentlyContinue
+          Copy-Item "LICENSE.txt" -Destination $outDir -ErrorAction SilentlyContinue
+          $zipName = "droute-${{ github.ref_name }}.zip"
+          if ($zipName -eq "droute-.zip") {
+            $zipName = "droute-${{ github.run_number }}.zip"
+          }
+          Compress-Archive -Path "$outDir\*" -DestinationPath $zipName -Force
+          Write-Output "Created archive: $zipName"
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: droute-build
+          path: droute-*.zip
+
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: droute-*.zip
+          name: Release ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+          generate_release_notes: true
