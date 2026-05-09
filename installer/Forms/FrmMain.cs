@@ -75,7 +75,7 @@ namespace Installer.Forms
 
         private void licenseLink_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            Process.Start("https://github.com/snowluwu/droute/LICENSE");
+            Process.Start("https://github.com/snowluwu/droute/blob/master/LICENSE.txt");
         }
 
         private void inspiredLink_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
