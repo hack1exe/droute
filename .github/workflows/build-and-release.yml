@@ -59,6 +59,9 @@ jobs:
           $outDir = "release"
           New-Item -ItemType Directory -Force -Path $outDir | Out-Null
           Copy-Item "installer\bin\Release\droute.exe" -Destination $outDir
+          Get-ChildItem -Path "installer\bin\Release" -Directory | ForEach-Object {
+            Copy-Item $_.FullName -Destination "$outDir\$($_.Name)" -Recurse -Force
+          }
           Copy-Item "README.md" -Destination $outDir -ErrorAction SilentlyContinue
           Copy-Item "LICENSE.txt" -Destination $outDir -ErrorAction SilentlyContinue
           $zipName = "droute-${{ github.ref_name }}.zip"
