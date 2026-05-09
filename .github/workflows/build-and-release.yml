@@ -27,6 +27,11 @@ jobs:
       - name: Restore NuGet packages
         run: nuget restore droute.sln
 
+      - name: Ensure Resources directory exists
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path "installer\Resources" | Out-Null
+
       - name: Build solution
         run: msbuild droute.sln /p:Configuration=Release /p:Platform=x64 /p:RestorePackages=false /verbosity:minimal
 
