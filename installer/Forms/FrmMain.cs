@@ -48,12 +48,7 @@ namespace Installer.Forms
 
         private void applyCfgButton_Click(object sender, EventArgs e)
         {
-            _cfg.Host = hostTextBox.Text;
-            _cfg.Port = (int)portNumeric.Value;
-            _cfg.User = userTextBox.Text;
-            _cfg.Password = passwordTextBox.Text;
-            _cfg.Apply();
-
+            ApplyConfig();
             if (Settings.Default.AutoRestartConfig)
             {
                 DiscordManager.Close(); 
@@ -100,11 +95,20 @@ namespace Installer.Forms
 
         private void installPatchButton_Click(object sender, EventArgs e)
         {
-            _cfg.Apply();
+            ApplyConfig();
             HandlePatchAction(FrmPatch.PatchAction.Install);
         }
         private void removePatchButton_Click(object sender, EventArgs e) 
             => HandlePatchAction(FrmPatch.PatchAction.Remove);
+
+        private void ApplyConfig()
+        {
+            _cfg.Host = hostTextBox.Text;
+            _cfg.Port = (int)portNumeric.Value;
+            _cfg.User = userTextBox.Text;
+            _cfg.Password = passwordTextBox.Text;
+            _cfg.Apply();
+        }
 
         private void HandlePatchAction(FrmPatch.PatchAction action)
         {
