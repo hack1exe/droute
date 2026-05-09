@@ -98,8 +98,11 @@ namespace Installer.Forms
             }
         }
 
-        private void installPatchButton_Click(object sender, EventArgs e) 
-            => HandlePatchAction(FrmPatch.PatchAction.Install);
+        private void installPatchButton_Click(object sender, EventArgs e)
+        {
+            _cfg.Apply();
+            HandlePatchAction(FrmPatch.PatchAction.Install);
+        }
         private void removePatchButton_Click(object sender, EventArgs e) 
             => HandlePatchAction(FrmPatch.PatchAction.Remove);
 
